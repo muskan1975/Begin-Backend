@@ -10,8 +10,8 @@ const PORT = process.env.PORT || 5000;
 app.use(bodyParser.json());
 app.use(cors());
 
-// Connect to MongoDB
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/linkDuplicator';
+// Connect to MongoDB                          
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/linkDuplicatorlink';
 mongoose.connect(MONGODB_URI, {})
   .then(() => {
     console.log('Connected to MongoDB');
