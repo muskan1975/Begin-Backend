@@ -4,14 +4,14 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 
 const app = express();
-const PORT = process.env.PORT || 5000; 
+const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(bodyParser.json());
 app.use(cors());
 
-// Connect to MongoDB                          
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://muskanambardekar76:muskansalim786@sms-soft.372qu1r.mongodb.net/?retryWrites=true&w=majority&appName=SMS-SOFT"
+// Connect to MongoDB
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://muskanambardekar76:muskansalim786@sms-soft.372qu1r.mongodb.net/?retryWrites=true&w=majority&appName=SMS-SOFT";
 mongoose.connect(MONGODB_URI, {})
   .then(() => {
     console.log('Connected to MongoDB');
@@ -25,10 +25,20 @@ const linkSchema = new mongoose.Schema({
   offerId: { type: String, required: true },
   domain: { type: String, required: true },
   randomText: { type: String, required: true },
-  duplicate: { type: String, required: true }
+  duplicate: { type: String, required: true },
+  clickCount: { type: Number, default: 0 }
 });
 
 const Link = mongoose.model('Link', linkSchema);
+
+// Define Visitor schema and model
+const visitorSchema = new mongoose.Schema({
+  linkId: { type: mongoose.Schema.Types.ObjectId, ref: 'Link', required: true },
+  ipAddress: { type: String },
+  timestamp: { type: Date, default: Date.now }
+});
+
+const Visitor = mongoose.model('Visitor', visitorSchema);
 
 // Routes
 app.get('/links', async (req, res) => {
@@ -67,6 +77,15 @@ app.get('/r/:domain/:randomText', async (req, res) => {
     const link = await Link.findOne({ domain, randomText });
 
     if (link) {
+      // Increment click count
+      link.clickCount++;
+      await link.save();
+
+      // Save visitor information
+      const visitor = new Visitor({ linkId: link._id, ipAddress: req.ip });
+      await visitor.save();
+
+      // Redirect to the original link
       res.redirect(link.original);
     } else {
       res.status(404).send('Link not found');
