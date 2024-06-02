@@ -11,7 +11,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // Connect to MongoDB
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://muskanambardekar76:muskansalim786@sms-soft.372qu1r.mongodb.net/?retryWrites=true&w=majority&appName=SMS-SOFT";
+const MONGODB_URI = process.env.MONGODB_URI || "your_mongodb_uri_here";
 mongoose.connect(MONGODB_URI, {})
   .then(() => {
     console.log('Connected to MongoDB');
